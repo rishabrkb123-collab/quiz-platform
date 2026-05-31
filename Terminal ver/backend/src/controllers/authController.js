@@ -86,7 +86,7 @@ async function login(req, res, next) {
     const isValidPassword = await bcrypt.compare(password, user.password);
 
     if (!isValidPassword) {
-      throw httpError(401, 'invalid password');
+      throw httpError(401, 'invalid email or password');
     }
 
     const token = signToken(user);

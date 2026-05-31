@@ -32,26 +32,36 @@ echo.
 REM Start dev servers in background
 start /B npm run dev > "%TEMP%\quiz-platform-dev.log" 2>&1
 
-REM Wait for backend to be ready
+REM Wait for servers to be ready
 echo  Waiting for servers to be ready...
+set BACKEND_URL=
+set FRONTEND_URL=
 :wait
 timeout /t 2 /nobreak >nul
-powershell -Command "try { $r = Invoke-WebRequest -Uri 'http://localhost:3000/health' -UseBasicParsing -TimeoutSec 2; if ($r.StatusCode -eq 200) { exit 0 } } catch { exit 1 }" 2>nul
-if errorlevel 1 goto wait
+if "%BACKEND_URL%"=="" (
+  powershell -Command "try { $log = Get-Content '%TEMP%\quiz-platform-dev.log' -ErrorAction Stop; $line = $log | Select-String 'Backend URL:' | Select-Object -Last 1; if ($line) { $url = $line.ToString().Substring($line.ToString().LastIndexOf(' ')+1); Write-Host $url; exit 0 } } catch { exit 1 }" 2>nul > "%TEMP%\quiz-be-url.txt"
+  set /p BACKEND_URL=<"%TEMP%\quiz-be-url.txt" 2>nul
+  del "%TEMP%\quiz-be-url.txt" 2>nul
+)
+if "%FRONTEND_URL%"=="" (
+  powershell -Command "try { $log = Get-Content '%TEMP%\quiz-platform-dev.log' -ErrorAction Stop; $line = $log | Select-String 'Frontend URL:' | Select-Object -Last 1; if ($line) { $url = $line.ToString().Substring($line.ToString().LastIndexOf(' ')+1); Write-Host $url; exit 0 } } catch { exit 1 }" 2>nul > "%TEMP%\quiz-fe-url.txt"
+  set /p FRONTEND_URL=<"%TEMP%\quiz-fe-url.txt" 2>nul
+  del "%TEMP%\quiz-fe-url.txt" 2>nul
+)
+if "%BACKEND_URL%"=="" goto wait
+if "%FRONTEND_URL%"=="" goto wait
 
-REM Try to detect frontend port from log
-set FRONTEND_URL=http://localhost:5173
-powershell -Command "try { $log = Get-Content '%TEMP%\quiz-platform-dev.log' -ErrorAction Stop; $line = $log | Select-String 'Frontend URL:' | Select-Object -Last 1; if ($line) { Write-Host $line.ToString().Substring($line.ToString().LastIndexOf(' ')+1) } } catch { Write-Host http://localhost:5173 }" 2>nul > "%TEMP%\quiz-fe-url.txt"
-set /p FRONTEND_URL=<"%TEMP%\quiz-fe-url.txt"
-del "%TEMP%\quiz-fe-url.txt" 2>nul
+if "%BACKEND_URL%"=="" set BACKEND_URL=http://localhost:3000
+if "%FRONTEND_URL%"=="" set FRONTEND_URL=http://localhost:5173
 
-echo  ^> Backend ready
+echo  ^> Backend ready at %BACKEND_URL%
+echo  ^> Frontend ready at %FRONTEND_URL%
 echo.
 echo ============================================
 echo   Mini Quiz Platform is running!
 echo.
 echo   Frontend : %FRONTEND_URL%
-echo   Backend  : http://localhost:3000
+echo   Backend  : %BACKEND_URL%
 echo.
 echo   Demo accounts:
 echo     admin@quiz.com / password123

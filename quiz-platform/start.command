@@ -34,24 +34,36 @@ DEV_PID=$!
 
 echo ""
 echo "  Waiting for servers to be ready..."
-for ((i=1; i<=20; i++)); do
-  if curl -s -o /dev/null -w "" http://localhost:3000/health 2>/dev/null; then
-    echo "  ✓ Backend ready"
+BACKEND_URL=""
+FRONTEND_URL=""
+for ((i=1; i<=50; i++)); do
+  if [ -z "$BACKEND_URL" ] && grep -q "Backend URL:" /tmp/quiz-platform-dev.log 2>/dev/null; then
+    BACKEND_URL=$(grep "Backend URL:" /tmp/quiz-platform-dev.log | tail -1 | sed 's/.*http/http/')
+    echo "  ✓ Backend ready at $BACKEND_URL"
+  fi
+  if [ -z "$FRONTEND_URL" ] && grep -q "Frontend URL:" /tmp/quiz-platform-dev.log 2>/dev/null; then
+    FRONTEND_URL=$(grep "Frontend URL:" /tmp/quiz-platform-dev.log | tail -1 | sed 's/.*http/http/')
+    echo "  ✓ Frontend ready at $FRONTEND_URL"
+  fi
+  if [ -n "$BACKEND_URL" ] && [ -n "$FRONTEND_URL" ]; then
     break
   fi
   sleep 1
 done
 
-# Parse frontend URL from log
-FRONTEND_URL="http://localhost:5173"
+if [ -z "$BACKEND_URL" ]; then
+  BACKEND_URL="http://localhost:3000"
+fi
+if [ -z "$FRONTEND_URL" ]; then
+  FRONTEND_URL="http://localhost:5173"
+fi
 
-echo "  ✓ Frontend ready"
 echo ""
 echo "============================================"
 echo "  Mini Quiz Platform is running!"
 echo ""
 echo "  Frontend : $FRONTEND_URL"
-echo "  Backend  : http://localhost:3000"
+echo "  Backend  : $BACKEND_URL"
 echo ""
 echo "  Demo accounts:"
 echo "    admin@quiz.com / password123"
@@ -61,7 +73,7 @@ echo "============================================"
 echo ""
 
 # Open browser
-open "http://localhost:5173" 2>/dev/null || true
+open "$FRONTEND_URL" 2>/dev/null || true
 
 # Wait for dev process
 trap "kill $DEV_PID 2>/dev/null; exit 0" INT TERM

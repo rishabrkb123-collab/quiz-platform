@@ -70,7 +70,39 @@ async function createQuestion(req, res, next) {
   }
 }
 
+async function deleteQuestion(req, res, next) {
+  try {
+    addDebugLog('controller', 'questionsController.deleteQuestion()');
+
+    const numericQuestionId = Number(req.params.id);
+
+    if (!Number.isInteger(numericQuestionId)) {
+      throw httpError(400, 'question id must be an integer');
+    }
+
+    addDebugLog('prisma', 'prisma.question.findUnique({ where: { id } })');
+    addDebugLog('sql', 'SELECT * FROM "Question" WHERE id = $1 LIMIT 1;');
+    const existingQuestion = await prisma.question.findUnique({ where: { id: numericQuestionId } });
+
+    if (!existingQuestion) {
+      throw httpError(404, 'question not found');
+    }
+
+    addDebugLog('prisma', 'prisma.question.delete({ where: { id } })');
+    addDebugLog('sql', 'DELETE FROM "Question" WHERE id = $1 RETURNING *;');
+    const deletedQuestion = await prisma.question.delete({ where: { id: numericQuestionId } });
+
+    res.json({
+      message: 'question removed',
+      question: deletedQuestion
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   createQuestion,
+  deleteQuestion,
   getQuestions
 };
