@@ -1,0 +1,22 @@
+{
+  "name": "quiz-platform-terminal",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Terminal-only quiz platform with Express, PostgreSQL, Prisma, JWT auth, and a Node CLI.",
+  "workspaces": [
+    "backend",
+    "cli"
+  ],
+  "scripts": {
+    "db:start": "docker compose up -d postgres",
+    "db:stop": "docker compose down",
+    "migrate": "npm --workspace backend run migrate",
+    "seed": "npm --workspace backend run seed",
+    "generate": "npm --workspace backend run generate",
+    "dev": "npm --workspace backend run dev",
+    "start": "npm --workspace backend run start",
+    "cli": "npm --workspace cli run cli --",
+    "stress:test": "node scripts/stress-test.js",
+    "setup": "npm install && npm run db:start && npm run migrate && npm run seed"
+  }
+}

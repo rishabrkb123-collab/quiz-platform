@@ -1,0 +1,19 @@
+{
+  "name": "quiz-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Full-stack Mini Quiz Platform with Express, PostgreSQL, Prisma, JWT auth, and React.",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "db:start": "docker compose up -d postgres",
+    "db:stop": "docker compose down",
+    "migrate": "npm --workspace backend run migrate",
+    "seed": "npm --workspace backend run seed",
+    "dev": "node scripts/start-dev.js",
+    "stress:test": "node scripts/stress-test.js",
+    "setup": "npm install && npm run db:start && npm run migrate && npm run seed"
+  }
+}

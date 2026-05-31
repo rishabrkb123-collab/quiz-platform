@@ -1,0 +1,27 @@
+{
+  "name": "quiz-platform-backend",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node src/server.js",
+    "start": "node src/server.js",
+    "migrate": "prisma migrate dev --name init",
+    "seed": "prisma db seed",
+    "generate": "prisma generate"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.16.0",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "prisma": "^6.16.0"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  }
+}

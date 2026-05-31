@@ -1,0 +1,9 @@
+{
+  "name": "quiz-platform-terminal-cli",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/index.js",
+  "scripts": {
+    "cli": "node src/index.js"
+  }
+}
