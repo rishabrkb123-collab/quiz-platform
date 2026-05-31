@@ -1,11 +1,11 @@
 import { useState } from 'react';
 
 const initialForm = {
-  questionText: '',
-  optionA: '',
-  optionB: '',
-  optionC: '',
-  optionD: '',
+  questionText: 'What does CLI stand for?',
+  optionA: 'Command Line Interface',
+  optionB: 'Code Link Input',
+  optionC: 'Central Logic Index',
+  optionD: 'Command Logic Internet',
   correctAnswer: 'A',
   points: 10
 };

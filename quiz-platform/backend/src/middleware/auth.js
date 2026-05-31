@@ -31,7 +31,9 @@ async function authenticate(req, _res, next) {
     req.user = user;
     next();
   } catch (error) {
-    next(error.status ? error : httpError(401, 'invalid token'));
+    console.error('authenticate error:', error.message);
+    addDebugLog('error', `authenticate error: ${error.message}`);
+    next(error.status ? error : httpError(error.code === 'P1001' ? 503 : 401, error.code === 'P1001' ? 'database unavailable' : 'invalid token'));
   }
 }
 

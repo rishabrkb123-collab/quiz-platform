@@ -36,9 +36,7 @@ app.use((error, _req, res, _next) => {
   const message = status === 500 ? 'internal server error' : error.message;
 
   addDebugLog('error', `${status} ${message}`);
-  if (status === 500) {
-    console.error(error);
-  }
+  console.error(`[ERROR] ${status} ${message}`, error.stack || '');
 
   res.status(status).json({ error: message });
 });
